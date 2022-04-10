@@ -1,6 +1,7 @@
 using AtomicTransactionDemo.Core;
 using AtomicTransactionDemo.Extension;
 using AtomicTransactionDemo.Services;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.ConfigureCustomerDbContext(builder.Configuration);
+builder.Services.RegisterHangFire(builder.Configuration);
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,8 +29,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseHangfireDashboard();
+
+
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHangfireDashboard();
+});
+BackgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+
 
 app.Run();
