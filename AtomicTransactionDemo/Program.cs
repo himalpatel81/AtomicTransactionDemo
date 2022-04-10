@@ -12,8 +12,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISendMessageService, SendToQueueMessageService>();
 
 builder.Services.ConfigureCustomerDbContext(builder.Configuration);
+builder.Services.ConfigureQuartz(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
